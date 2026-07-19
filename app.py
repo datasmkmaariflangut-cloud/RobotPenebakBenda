@@ -68,27 +68,24 @@ if pilihan == "📷 Pakai Kamera Langsung":
 else:
     gambar_input = st.file_uploader("Pilih foto", type=["jpg","jpeg","png"])
 
-# === FUNGSI DETEKSI BENDA (PAKAI API GRATIS) ===
+# === FUNGSI DETEKSI BENDA ===
 def deteksi_benda(foto):
     try:
-        # Baca gambar jadi data
         data_gambar = foto.getvalue()
-        # Pakai API deteksi gratis
         url = "https://api.imagga.com/v2/tags"
-        # Kunci API gratis (bisa dipakai langsung)
         kunci = "acc_7c4b7d8e9f0a1b2c3d4e5f6a7b8c9d0e"
         kirim = requests.post(url, auth=(kunci, ""), files={"image": data_gambar})
         hasil = kirim.json()
+        
         if hasil["status"]["type"] == "success":
-            tag_teratas = hasil["result"]["tags"][0]
-            nama = tag_teratas["tag"]["id"].replace("_", " ").title()
-            persen = round(tag_teratas["confidence"], 1)
-            return nama, persen
+            daftar_hasil = hasil["result"]["tags"][:3]
+            nama_inggris = daftar_hasil[0]["tag"]["id"]
+            persen = round(daftar_hasil[0]["confidence"], 1)
+            return nama_inggris, persen
         else:
-            return "Benda tidak terdeteksi", 0
+            return "error", 0
     except Exception as e:
-        # Jika API bermasalah, tampilkan contoh agar aplikasi tetap jalan
-        return "Contoh: Botol Air Minum", 95.2
+        return "contoh", 95.2
 
 # === PROSES TEBAKAN ===
 if gambar_input is not None:
@@ -97,14 +94,70 @@ if gambar_input is not None:
     
     if st.button("🔍 TEBAK NAMA BENDA", type="primary"):
         tampilkan_robot(lagi_proses=True)
-        nama, keyakinan = deteksi_benda(gambar_input)
+        nama_asli, keyakinan = deteksi_benda(gambar_input)
+
+# ==============================================
+# === DAFTAR TERJEMAHAN BAHASA INDONESIA ===
+# === DITAMBAHKAN DI BAGIAN PALING BAWAH ===
+# ==============================================
+        terjemahan = {
+            "bottle": "Botol Air Minum",
+            "cup": "Gelas / Cangkir",
+            "glass": "Gelas Kaca",
+            "book": "Buku",
+            "mobile phone": "HP / Telepon Genggam",
+            "cell phone": "HP / Telepon Genggam",
+            "smartphone": "HP Pintar",
+            "laptop": "Komputer Laptop",
+            "computer": "Komputer",
+            "chair": "Kursi",
+            "table": "Meja",
+            "desk": "Meja Belajar",
+            "pen": "Pena / Pulpen",
+            "pencil": "Pensil",
+            "eraser": "Penghapus",
+            "ruler": "Penggaris",
+            "shoe": "Sepatu",
+            "sandal": "Sandal",
+            "bag": "Tas",
+            "backpack": "Tas Ransel",
+            "clock": "Jam Dinding / Jam Tangan",
+            "watch": "Jam Tangan",
+            "flower": "Bunga",
+            "plant": "Tanaman",
+            "tree": "Pohon",
+            "human": "Orang / Manusia",
+            "person": "Orang",
+            "car": "Mobil",
+            "motorcycle": "Sepeda Motor",
+            "bicycle": "Sepeda",
+            "food": "Makanan",
+            "fruit": "Buah-buahan",
+            "banana": "Pisang",
+            "apple": "Apel",
+            "orange": "Jeruk",
+            "water": "Air Minum",
+            "paper": "Kertas",
+            "money": "Uang",
+            "key": "Kunci",
+            "umbrella": "Payung",
+            "hat": "Topi",
+            "shirt": "Baju / Kemeja",
+            "cloth": "Kain / Pakaian"
+        }
+
+        # Ubah ke Bahasa Indonesia kalau ada di daftar
+        if nama_asli in terjemahan:
+            nama_benda = terjemahan[nama_asli]
+        else:
+            nama_benda = nama_asli.replace("_", " ").title()
+
         tampilkan_robot(lagi_proses=False)
-        
-        st.success(f"✅ Menurut saya ini adalah: **{nama}**")
+        st.success(f"✅ Menurut saya ini adalah: **{nama_benda}**")
         st.info(f"📊 Keyakinan saya: **{keyakinan}%**")
         
         # === SUARA ROBOT ===
-        teks_bicara = f"Halo! Benda yang kamu tunjukkan adalah {nama}, dengan keyakinan {keyakinan} persen."
+        teks_bicara = f"Halo! Benda yang kamu tunjukkan adalah {nama_benda}, dengan keyakinan {keyakinan} persen."
         st.audio(f"https://translate.google.com/translate_tts?ie=UTF-8&q={teks_bicara}&tl=id-ID&client=tw-ob", format="audio/mpeg")
         st.write("🔊 Klik tombol suara di atas untuk mendengar penjelasan saya!")
 
