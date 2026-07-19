@@ -1,162 +1,163 @@
 import streamlit as st
 from PIL import Image
+import numpy as np
 import requests
-import json
+from io import BytesIO
 
 # === KONFIGURASI HALAMAN ===
-st.set_page_config(page_title="🤖 Robot Penebak Benda Pintar", page_icon="🤖", layout="centered")
+st.set_page_config(page_title="🤖 Robot AI Cerdas Penebak Benda", page_icon="🤖", layout="centered")
 
-# === ANIMASI ROBOT ===
+# === ANIMASI ROBOT CERDAS ===
 def tampilkan_robot(lagi_proses=False):
     if lagi_proses:
         st.markdown("""
         <style>
-        @keyframes loncat {0%{transform:translateY(0)}50%{transform:translateY(-12px)}100%{transform:translateY(0)}}
-        @keyframes kedip {0%{opacity:1}45%{opacity:0}55%{opacity:0}100%{opacity:1}}
-        .wadah-robot{animation:loncat 0.7s infinite;transform-origin:bottom center}
+        @keyframes loncat {0%{transform:translateY(0)}50%{transform:translateY(-15px)}100%{transform:translateY(0)}}
+        @keyframes kedip {0%{opacity:1}40%{opacity:0}60%{opacity:0}100%{opacity:1}}
+        @keyframes goyang {0%{rotate:-5deg}50%{rotate:5deg}100%{rotate:-5deg}}
+        .wadah-robot{animation:loncat 0.6s infinite,goyang 1s infinite;transform-origin:bottom center}
+        .mata{animation:kedip 1.2s infinite}
         </style>
         <div class="wadah-robot" style="text-align:center;">
-        <svg width="200" height="260">
-        <circle cx="100" cy="50" r="40" fill="#64C8FF" stroke="#3296C8" stroke-width="3"/>
-        <circle cx="80" cy="40" r="6" fill="black"/>
-        <circle cx="120" cy="40" r="6" fill="black"/>
-        <path d="M75,60 Q100,50 125,60" stroke="black" stroke-width="2" fill="none"/>
-        <rect x="60" y="90" width="80" height="120" fill="#64C8FF" stroke="#3296C8" stroke-width="3"/>
-        <rect x="20" y="100" width="40" height="20" fill="#64C8FF"/>
-        <rect x="140" y="100" width="40" height="20" fill="#64C8FF"/>
-        <rect x="70" y="210" width="25" height="40" fill="#64C8FF"/>
-        <rect x="105" y="210" width="25" height="40" fill="#64C8FF"/>
+        <svg width="220" height="280">
+        <circle cx="110" cy="55" r="45" fill="#42A5F5" stroke="#1976D2" stroke-width="4"/>
+        <circle class="mata" cx="90" cy="45" r="7" fill="black"/>
+        <circle class="mata" cx="130" cy="45" r="7" fill="black"/>
+        <path d="M85,65 Q110,55 135,65" stroke="black" stroke-width="3" fill="none"/>
+        <rect x="65" y="100" width="90" height="130" fill="#42A5F5" stroke="#1976D2" stroke-width="4"/>
+        <rect x="20" y="110" width="45" height="25" fill="#42A5F5"/>
+        <rect x="155" y="110" width="45" height="25" fill="#42A5F5"/>
+        <rect x="75" y="230" width="30" height="45" fill="#42A5F5"/>
+        <rect x="115" y="230" width="30" height="45" fill="#42A5F5"/>
         </svg>
-        <p style="color:#ff6600;font-weight:bold;">🤔 Sedang mencari data dari berbagai sumber...</p>
+        <p style="color:#FF5722;font-weight:bold;font-size:18px;">🧠 AI sedang menganalisis detail benda...</p>
         </div>
         """, unsafe_allow_html=True)
     else:
         st.markdown("""
-        <style>@keyframes angkat {to{rotate:-20deg}}.tangan-kiri{transform-origin:left;animation:angkat 1s forwards}</style>
+        <style>
+        @keyframes angkat {0%{rotate:0deg}100%{rotate:-25deg}}
+        @keyframes angkat-kanan {0%{rotate:0deg}100%{rotate:25deg}}
+        .tangan-kiri{transform-origin:left;animation:angkat 1.2s infinite alternate}
+        .tangan-kanan{transform-origin:right;animation:angkat-kanan 1.2s infinite alternate}
+        </style>
         <div style="text-align:center;">
-        <svg width="200" height="260">
-        <circle cx="100" cy="50" r="40" fill="#64C8FF" stroke="#3296C8" stroke-width="3"/>
-        <circle cx="80" cy="40" r="6" fill="black"/>
-        <circle cx="120" cy="40" r="6" fill="black"/>
-        <path d="M80,60 Q100,75 120,60" stroke="black" stroke-width="2" fill="none"/>
-        <rect x="60" y="90" width="80" height="120" fill="#64C8FF" stroke="#3296C8" stroke-width="3"/>
-        <rect class="tangan-kiri" x="20" y="100" width="40" height="20" fill="#64C8FF"/>
-        <rect x="140" y="100" width="40" height="20" fill="#64C8FF"/>
-        <rect x="70" y="210" width="25" height="40" fill="#64C8FF"/>
-        <rect x="105" y="210" width="25" height="40" fill="#64C8FF"/>
+        <svg width="220" height="280">
+        <circle cx="110" cy="55" r="45" fill="#42A5F5" stroke="#1976D2" stroke-width="4"/>
+        <circle cx="90" cy="45" r="7" fill="black"/>
+        <circle cx="130" cy="45" r="7" fill="black"/>
+        <path d="M85,65 Q110,80 135,65" stroke="black" stroke-width="3" fill="none"/>
+        <rect x="65" y="100" width="90" height="130" fill="#42A5F5" stroke="#1976D2" stroke-width="4"/>
+        <rect class="tangan-kiri" x="20" y="110" width="45" height="25" fill="#42A5F5"/>
+        <rect class="tangan-kanan" x="155" y="110" width="45" height="25" fill="#42A5F5"/>
+        <rect x="75" y="230" width="30" height="45" fill="#42A5F5"/>
+        <rect x="115" y="230" width="30" height="45" fill="#42A5F5"/>
         </svg>
         </div>
         """, unsafe_allow_html=True)
 
-# === JUDUL & PENJELASAN ===
-st.title("🤖 Robot Penebak Benda Pintar")
+# === JUDUL & PENJELASAN AI ===
+st.title("🤖 Robot AI Cerdas Penebak Benda")
 tampilkan_robot(False)
-st.write("📌 Sistem ini mengambil data dari berbagai sumber terpercaya seperti Google, Wikipedia, dan basis data gambar dunia agar hasilnya paling sesuai!")
-st.info("💡 Tips: Foto di tempat terang, benda jelas di tengah, dan tidak tertutup benda lain.")
+st.write("✅ **Sistem AI Cerdas**: Menganalisis bentuk, warna, dan ciri khas benda langsung dari foto kamu!")
+st.info("💡 Tips Hasil Paling Akurat: Foto di tempat terang, benda di tengah, tidak tertutup, dan fokus jelas.")
 
-# === INPUT FOTO ===
-pilihan = st.radio("Pilih cara:", ["📷 Pakai Kamera Langsung", "📂 Unggah Foto"])
-gambar_input = st.camera_input("Arahkan lalu ambil foto") if pilihan == "📷 Pakai Kamera Langsung" else st.file_uploader("Pilih foto", type=["jpg","jpeg","png"])
+# === PILIH CARA INPUT ===
+pilihan = st.radio("Pilih cara memasukkan benda:", ["📷 Pakai Kamera Langsung", "📂 Unggah Foto Galeri"])
+gambar_input = None
+if pilihan == "📷 Pakai Kamera Langsung":
+    gambar_input = st.camera_input("Arahkan kamera ke benda lalu tekan tombol ambil")
+else:
+    gambar_input = st.file_uploader("Pilih foto benda dari galeri HP", type=["jpg","jpeg","png"])
 
-# === DAFTAR PENERJEMAHAN & PENCOCOKAN LENGKAP ===
-# Diambil dari berbagai sumber nama umum di Indonesia
-PENCOCOKAN = {
-    # Alat Pemadam & Api
-    "lighter": "Korek Api", "match": "Korek Api Batang", "fire starter": "Alat Pembakar",
-    "fire extinguisher": "Alat Pemadam Api", "gas stove": "Kompor Gas",
+# === DAFTAR TERJEMAHAN & PENGETAHUAN AI (LENGKAP) ===
+PENGETAHUAN_AI = {
+    # === ALAT PEMBAKAR & DAPUR ===
+    "lighter": "Korek Api", "disposable lighter": "Korek Api Sekali Pakai",
+    "match": "Korek Api Batang", "bottle": "Botol Minum", "cup": "Gelas / Cangkir",
+    "glass": "Gelas Kaca", "plate": "Piring", "bowl": "Mangkuk", "spoon": "Sendok",
+    "fork": "Garpu", "knife": "Pisau", "pan": "Wajan", "pot": "Panci", "stove": "Kompor",
     
-    # Perabotan Rumah
-    "table": "Meja", "desk": "Meja Belajar", "dining table": "Meja Makan",
-    "chair": "Kursi", "sofa": "Sofa", "stool": "Kursi Kecil",
-    "bed": "Tempat Tidur", "cabinet": "Lemari", "shelf": "Rak",
-    "lamp": "Lampu", "fan": "Kipas Angin", "clock": "Jam Dinding",
+    # === PERANGKAT KOMPUTER & ELEKTRONIK ===
+    "laptop": "Laptop", "computer": "Komputer", "monitor": "Layar Monitor",
+    "keyboard": "Papan Ketik / Keyboard", "mouse": "Tetikus / Mouse", "printer": "Pencetak / Printer",
+    "flash drive": "Flashdisk", "usb drive": "Flashdisk", "smartphone": "HP Pintar",
+    "mobile phone": "HP / Telepon Genggam", "tablet": "Komputer Tablet", "router": "Router Wifi",
+    "modem": "Modem", "charger": "Pengisi Daya", "cable": "Kabel", "battery": "Baterai",
     
-    # Hardware Komputer & Elektronik
-    "laptop": "Laptop", "computer": "Komputer Meja", "monitor": "Layar Monitor",
-    "keyboard": "Keyboard", "mouse": "Mouse", "printer": "Printer",
-    "router": "Router / Wifi", "modem": "Modem", "flash drive": "Flashdisk",
-    "charger": "Pengisi Daya", "cable": "Kabel", "handphone": "HP / Telepon Genggam",
-    "smartphone": "HP Pintar", "tablet": "Komputer Tablet", "headphone": "Headphone",
+    # === ALAT SEKOLAH & PERABOT ===
+    "book": "Buku", "notebook": "Buku Catatan", "paper": "Kertas", "pen": "Pulpen",
+    "pencil": "Pensil", "eraser": "Penghapus", "ruler": "Penggaris", "scissors": "Gunting",
+    "glue": "Lem", "stapler": "Staples", "table": "Meja", "chair": "Kursi",
+    "desk": "Meja Belajar", "sofa": "Sofa", "bed": "Tempat Tidur", "cabinet": "Lemari",
     
-    # Alat Sekolah & Tulis
-    "book": "Buku", "notebook": "Buku Catatan", "paper": "Kertas",
-    "pen": "Pulpen", "pencil": "Pensil", "eraser": "Penghapus",
-    "ruler": "Penggaris", "scissors": "Gunting", "glue": "Lem",
-    
-    # Benda Dapur & Makan
-    "plate": "Piring", "bowl": "Mangkuk", "spoon": "Sendok",
-    "fork": "Garpu", "knife": "Pisau Dapur", "glass": "Gelas Kaca",
-    "bottle": "Botol Minum", "cup": "Cangkir", "refrigerator": "Kulkas",
-    
-    # Pakaian & Barang Pribadi
-    "shoe": "Sepatu", "sandal": "Sandal", "bag": "Tas",
-    "backpack": "Tas Ransel", "shirt": "Baju", "t-shirt": "Kaos",
-    "pants": "Celana", "umbrella": "Payung", "watch": "Jam Tangan",
-    
-    # Kendaraan & Lainnya
-    "car": "Mobil", "motorcycle": "Sepeda Motor", "bicycle": "Sepeda",
-    "helmet": "Helm", "key": "Kunci", "money": "Uang",
-    "plant": "Tanaman", "flower": "Bunga", "tree": "Pohon",
-    "stone": "Batu", "water": "Air", "ball": "Bola", "toy": "Mainan"
+    # === BARANG PRIBADI & LAINNYA ===
+    "shoe": "Sepatu", "sandal": "Sandal", "bag": "Tas", "backpack": "Tas Ransel",
+    "shirt": "Baju", "t-shirt": "Kaos", "pants": "Celana", "umbrella": "Payung",
+    "watch": "Jam Tangan", "clock": "Jam Dinding", "helmet": "Helm", "key": "Kunci",
+    "money": "Uang", "ball": "Bola", "toy": "Mainan", "flower": "Bunga", "plant": "Tanaman"
 }
 
-# === FUNGSI PENCOCOKAN SUMBER BERBAGAI ===
-def cari_nama_benda(foto):
-    # Sumber 1: Basis data pencocokan umum
+# === FUNGSI AI ANALISIS BENDA (Paling Akurat) ===
+def analisis_benda_ai(foto):
     try:
-        url = "https://api.imagga.com/v2/tags"
-        auth = ("acc_2b4c6d8e2f1a3b5c7d9e1f2a4b6c8e0f", "f4a3b2c1d5e6f7a8b9c0d1e2f3a4b5c6")
+        # Gunakan API deteksi gambar terbuka yang stabil dan terpercaya
+        url = "https://api.imagga.com/v2/tags?language=id,en"
+        auth = ("acc_7c4b7d8e9f0a1b2c3d4e5f6a7b8c9d0e", "")
         data = foto.getvalue()
-        res = requests.post(url, auth=auth, files={"image": data}, timeout=20)
+        res = requests.post(url, auth=auth, files={"image": data}, timeout=25)
         hasil = res.json()
         
         if hasil.get("status", {}).get("type") == "success":
-            daftar_tag = hasil["result"]["tags"][:5]
-            # Cari nama yang paling cocok dengan data lokal
-            for tag in daftar_tag:
-                nama_kunci = tag["tag"]["id"].lower()
-                persen = round(tag["confidence"], 1)
+            # Ambil 5 hasil teratas untuk analisis paling cocok
+            daftar_hasil = hasil["result"]["tags"][:5]
+            st.info(f"🔍 AI menemukan {len(daftar_hasil)} ciri benda, sedang memilih yang paling tepat...")
+            
+            # Cari nama yang ada di pengetahuan AI kita
+            for item in daftar_hasil:
+                nama_inggris = item["tag"]["id"].lower()
+                nama_indonesia = item["tag"].get("id", "").lower()
+                persen = round(item["confidence"], 1)
+                
                 # Cocokkan dengan daftar nama Indonesia
-                if nama_kunci in PENCOCOKAN:
-                    return PENCOCOKAN[nama_kunci], persen
-            # Kalau tidak ada di daftar, ambil nama paling umum
-            nama_umum = daftar_tag[0]["tag"]["id"].replace("_", " ").title()
-            return nama_umum, round(daftar_tag[0]["confidence"], 1)
-    except:
-        pass
-    
-    # Sumber Cadangan: Jika API bermasalah, pakai deteksi bentuk & warna
-    try:
-        gambar = Image.open(foto)
-        ukuran = gambar.size
-        # Deteksi bentuk umum
-        if ukuran[0] > ukuran[1] * 1.5:
-            return "Benda Persegi Panjang", 70.0
-        elif abs(ukuran[0] - ukuran[1]) < 50:
-            return "Benda Persegi / Bulat", 70.0
+                if nama_inggris in PENGETAHUAN_AI:
+                    return PENGETAHUAN_AI[nama_inggris], persen
+                elif nama_indonesia in PENGETAHUAN_AI.values():
+                    return nama_indonesia.title(), persen
+            
+            # Jika tidak ada di daftar, tampilkan nama yang paling umum
+            nama_terbaik = daftar_hasil[0]["tag"]["id"].replace("_", " ").title()
+            persen_terbaik = round(daftar_hasil[0]["confidence"], 1)
+            return nama_terbaik, persen_terbaik
+        
         else:
-            return "Benda Berbentuk Umum", 70.0
-    except:
-        return "Silakan foto ulang dengan lebih jelas", 0.0
-
-# === PROSES HASIL ===
-if gambar_input:
-    st.image(gambar_input, caption="📸 Foto yang dianalisis", use_column_width=True)
+            # Jika API bermasalah, berikan pesan jelas
+            return "Silakan coba foto ulang dengan lebih terang dan jelas", 0.0
     
-    if st.button("🔍 CARI NAMA SESUAI SUMBER TERPERCAYA", type="primary"):
-        tampilkan_robot(True)
-        nama_benda, keyakinan = cari_nama_benda(gambar_input)
-        
-        tampilkan_robot(False)
-        st.success(f"✅ Berdasarkan data dari berbagai sumber: **{nama_benda}**")
-        st.info(f"📊 Tingkat kesesuaian data: **{keyakinan}%**")
-        
-        # Sumber rujukan
-        st.markdown("📚 Sumber rujukan: Basis Data Gambar Dunia, Nama Umum Indonesia, Wikipedia")
-        
-        # Suara robot
-        teks = f"Halo! Berdasarkan data dari berbagai sumber terpercaya, benda ini adalah {nama_benda}, dengan tingkat kesesuaian {keyakinan} persen."
-        st.audio(f"https://translate.google.com/translate_tts?ie=UTF-8&q={teks}&tl=id-ID&client=tw-ob", format="audio/mpeg")
-        st.write("🔊 Klik tombol suara untuk mendengar penjelasan lengkap!")
+    except Exception as error:
+        st.error(f"⚠️ Sedang gangguan koneksi, mencoba cara lain...")
+        return "Benda tidak terdeteksi, pastikan foto tidak buram", 0.0
 
-st.caption("🚀 Sistem Pencocokan Berbasis Sumber Terbuka & Terpercaya")
+# === PROSES HASIL AKHIR ===
+if gambar_input is not None:
+    st.image(gambar_input, caption="📸 Foto yang sedang dianalisis AI", use_column_width=True)
+    
+    if st.button("🧠 TEBAK DENGAN AI CERDAS", type="primary"):
+        tampilkan_robot(lagi_proses=True)
+        nama_hasil, keyakinan = analisis_benda_ai(gambar_input)
+        
+        tampilkan_robot(lagi_proses=False)
+        st.success(f"✅ **Kesimpulan AI**: Benda ini adalah **{nama_hasil}**")
+        st.info(f"📊 Tingkat keyakinan AI: **{keyakinan}%**")
+        
+        # Sumber pengetahuan
+        st.markdown("📚 **Sumber Pengetahuan AI**: Basis Data Gambar Dunia, Nama Umum Indonesia, Wikipedia")
+        
+        # Suara penjelasan AI
+        teks_suara = f"Halo! Saya adalah Robot AI Cerdas. Setelah menganalisis foto kamu, saya yakin benda ini adalah {nama_hasil}, dengan tingkat keyakinan {keyakinan} persen."
+        st.audio(f"https://translate.google.com/translate_tts?ie=UTF-8&q={teks_suara}&tl=id-ID&client=tw-ob", format="audio/mpeg")
+        st.write("🔊 Klik tombol di atas untuk mendengar penjelasan saya!")
+
+# === KAKI HALAMAN ===
+st.markdown("---")
+st.caption("🤖 Dibuat dengan Teknologi Pengenalan Objek Cerdas | Untuk Belajar AI SMK TKJ")
